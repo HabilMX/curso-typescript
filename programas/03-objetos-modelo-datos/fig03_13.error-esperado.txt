@@ -1,0 +1,1 @@
+fig03_13.ts(8,7): error TS2741: Property 'timeoutMs' is missing in type '{ nombre: string; url: string; }' but required in type 'Servicio'.

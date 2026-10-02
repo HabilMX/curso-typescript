@@ -1,0 +1,2 @@
+{"estados":[{"servicio":{"nombre":"catálogo","url":"https://catalogo.example","timeoutMs":1500},"tipo":"disponible","codigoHttp":200,"duracionMs":42},{"servicio":{"nombre":"pagos","url":"https://pagos.example","timeoutMs":3000},"tipo":"falla","detalle":"tiempo límite"}]}
+404 {"detalle":"ruta no encontrada"}

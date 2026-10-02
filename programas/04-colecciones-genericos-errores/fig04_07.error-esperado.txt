@@ -1,0 +1,1 @@
+fig04_07.ts(3,10): error TS18046: 'error' is of type 'unknown'.

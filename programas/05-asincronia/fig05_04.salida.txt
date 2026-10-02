@@ -1,0 +1,3 @@
+catálogo: disponible
+pagos: disponible
+inventario: disponible

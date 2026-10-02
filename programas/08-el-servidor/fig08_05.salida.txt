@@ -1,0 +1,48 @@
+$ cd fig08_05
+$ npm run verificar
+> verificar
+> tsc --noEmit
+$ npm run lint
+> lint
+> eslint src
+$ npm run formato
+> formato
+> prettier --check src
+
+Checking formatting...
+All matched files use Prettier code style!
+$ npm run probar
+> probar
+> npm run compilar && node --test "dist/**/*.test.js"
+
+
+> compilar
+> tsc
+
+✔ leerPuerto: sin variable usa 3000 (0.638417ms)
+✔ leerPuerto: un puerto válido (0.069958ms)
+✔ leerPuerto: 65535 es el límite (0.187208ms)
+✔ leerPuerto: 65536 se pasa del límite (0.0895ms)
+✔ leerPuerto: 0 no es un puerto (0.048708ms)
+✔ leerPuerto: un decimal se rechaza (0.033125ms)
+✔ leerPuerto: texto se rechaza (0.044541ms)
+✔ leerPuerto: la cadena vacía se rechaza (0.030416ms)
+✔ esReportePublico: un reporte con las dos variantes (0.406375ms)
+✔ esReportePublico: null (0.301167ms)
+✔ esReportePublico: estados no es un arreglo (0.160583ms)
+✔ esReportePublico: un estado con un tipo desconocido (0.798917ms)
+✔ esReportePublico: codigoHttp llega como texto (0.062ms)
+✔ disponible conserva código y duración (0.435ms)
+✔ falla conserva detalle (0.072583ms)
+✔ el reporte público no publica la URL ni el tiempo límite (0.337458ms)
+✔ GET /api/estados revisa destinos reales y publica el reporte (165.446042ms)
+✔ las rutas desconocidas, los métodos y los errores internos responden con su código (4.957833ms)
+✔ una ruta que no se puede analizar responde 404 y no derriba el servidor (3.789583ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 239.299834

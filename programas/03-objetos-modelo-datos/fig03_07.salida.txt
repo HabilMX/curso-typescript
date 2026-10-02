@@ -1,0 +1,1 @@
+pagos: https://pagos.example (3000 ms)

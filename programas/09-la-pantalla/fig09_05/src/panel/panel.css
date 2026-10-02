@@ -1,0 +1,25 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem auto;
+  max-width: 40rem;
+  padding: 0 1rem;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  border-left: 0.5rem solid #888;
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+}
+
+li.disponible {
+  border-color: #1a7f37;
+}
+
+li.falla {
+  border-color: #cf222e;
+}

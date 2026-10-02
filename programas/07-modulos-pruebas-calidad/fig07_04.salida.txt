@@ -1,0 +1,34 @@
+$ cd fig07_04
+$ npm run lint
+> lint
+> eslint src
+$ npm run formato
+> formato
+> prettier --check src
+
+Checking formatting...
+All matched files use Prettier code style!
+$ npm run probar
+> probar
+> npm run compilar && node --test "dist/**/*.test.js"
+
+
+> compilar
+> tsc
+
+✔ disponible conserva código y duración (0.341167ms)
+✔ falla conserva detalle (0.057417ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 148.684583
+$ npm run arrancar
+> arrancar
+> node dist/main.js
+
+catálogo: HTTP 204 en 12 ms
+pagos: falla (conexión rechazada)

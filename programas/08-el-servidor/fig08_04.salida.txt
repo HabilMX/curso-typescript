@@ -1,0 +1,4 @@
+{"evento":"solicitud","detalle":"llegó; responderá en 100 ms"}
+{"evento":"cierre","detalle":"SIGTERM recibida: no se aceptan conexiones nuevas"}
+{"evento":"cliente","detalle":"recibió «terminé»"}
+{"evento":"cerrado","detalle":"ya no queda ninguna solicitud en curso"}

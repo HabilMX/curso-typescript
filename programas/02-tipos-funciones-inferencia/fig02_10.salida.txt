@@ -1,0 +1,2 @@
+pagos: falla (tiempo agotado)
+catálogo: falla sin detalle

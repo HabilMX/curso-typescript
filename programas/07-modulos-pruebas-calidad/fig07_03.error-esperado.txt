@@ -1,0 +1,1 @@
+fig07_03.ts(2,10): error TS2305: Module '"./fig07_03/revisor.js"' has no exported member 'revisarUno'.

@@ -1,0 +1,42 @@
+name: Verificar programas
+
+# Cada programa del curso se compila con tsc estricto y se ejecuta en cada
+# cambio. Esta corrida es pública: cualquiera puede abrirla y ver el resultado
+# de cada paso.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: herramientas/package-lock.json
+
+      - name: Instalar TypeScript y los tipos (versiones fijadas en herramientas/package-lock.json)
+        working-directory: herramientas
+        run: npm ci
+
+      - name: Compilar con tsc estricto, ejecutar y comparar la salida de cada programa
+        run: herramientas/verificar-programas.sh
+
+      - name: Comprobar que programas/ coincide con las lecciones
+        run: herramientas/generar-programas.sh --comprobar
+
+      - name: Comprobar la plantilla de cada lección
+        run: herramientas/verificar-plantilla.sh
+
+      - name: Medir la profundidad (palabras de explicación)
+        run: herramientas/medir-profundidad.sh
+
+      - name: Revisar que no haya material que no debe publicarse
+        run: ./verificar-publicable.sh

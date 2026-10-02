@@ -1,0 +1,1 @@
+fig04_08.ts(9,16): error TS2532: Object is possibly 'undefined'.

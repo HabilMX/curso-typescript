@@ -1,0 +1,5 @@
+PUERTO=undefined -> puerto 3000
+PUERTO=8080 -> puerto 8080
+PUERTO=65536 -> rechazado: PUERTO debe estar entre 1 y 65535
+PUERTO=0 -> rechazado: PUERTO debe ser un entero positivo
+PUERTO=hola -> rechazado: PUERTO debe ser un entero positivo

@@ -1,0 +1,1 @@
+fig03_14.ts(26,13): error TS2322: Type 'EstadoCancelado' is not assignable to type 'never'.

@@ -1,0 +1,5 @@
+$ cd fig07_02
+$ npx tsc -p tsconfig.json
+$ node dist/main.js
+ok - disponible conserva código y duración
+ok - falla conserva detalle

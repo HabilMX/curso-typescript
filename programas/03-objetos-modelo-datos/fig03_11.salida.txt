@@ -1,0 +1,10 @@
+$ cd fig03_11
+$ npm run compilar
+> compilar
+> tsc
+$ npm run arrancar
+> arrancar
+> node dist/main.js
+
+catálogo: HTTP 200 en 42 ms
+pagos: falla (tiempo agotado)

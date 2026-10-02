@@ -1,0 +1,6 @@
+$ cd fig01_05
+$ npx tsc src/main.ts
+error TS5112: tsconfig.json is present but will not be loaded if files are specified on commandline. Use '--ignoreConfig' to skip this error.
+$ npx tsc --project tsconfig.json
+$ node dist/main.js
+revisor: entorno listo

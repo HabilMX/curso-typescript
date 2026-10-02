@@ -1,0 +1,3 @@
+catálogo: HTTP 200
+pagos: falla (conexión rechazada)
+inventario: falla (tiempo límite)

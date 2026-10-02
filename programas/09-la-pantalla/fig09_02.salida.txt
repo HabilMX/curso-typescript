@@ -1,0 +1,2 @@
+primer render: <p>Cargando…</p>
+tras el efecto: <p>2 servicios</p>

@@ -1,0 +1,1 @@
+fig00_06.ts(3,10): error TS18048: 'detalle' is possibly 'undefined'.

@@ -1,0 +1,2 @@
+puerto numérico: 443
+puerto configurado: 8080

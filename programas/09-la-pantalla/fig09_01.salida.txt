@@ -1,0 +1,1 @@
+<ul><li><strong>catálogo</strong> disponible: HTTP 200</li><li><strong>pagos</strong> falla: tiempo límite</li></ul>

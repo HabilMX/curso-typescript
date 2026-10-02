@@ -1,0 +1,2 @@
+catálogo: límite de 1500 ms
+pagos: límite de 3000 ms

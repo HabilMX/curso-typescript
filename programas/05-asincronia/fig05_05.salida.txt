@@ -1,0 +1,4 @@
+Promise.all: conexión rechazada
+catálogo: disponible
+pagos: falla (conexión rechazada)
+inventario: disponible

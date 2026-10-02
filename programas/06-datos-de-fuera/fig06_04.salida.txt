@@ -1,0 +1,2 @@
+puerto: 8080
+máximo inválido: REVISOR_MAX_SERVICIOS debe ser un entero positivo

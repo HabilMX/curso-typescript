@@ -1,0 +1,5 @@
+$ cd fig07_01
+$ npx tsc -p tsconfig.json
+$ node dist/main.js
+catálogo: HTTP 200 en 42 ms
+pagos: falla (tiempo límite)

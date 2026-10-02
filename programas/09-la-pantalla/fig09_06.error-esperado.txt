@@ -1,0 +1,2 @@
+fig09_06.tsx(12,44): error TS2322: Type '"pendiente"' is not assignable to type '"disponible" | "falla"'.
+fig09_06.tsx(13,6): error TS2741: Property 'estado' is missing in type '{}' but required in type '{ readonly estado: EstadoPublico; }'.

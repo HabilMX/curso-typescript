@@ -1,0 +1,2 @@
+catálogo: 1500 ms
+inválido: timeoutMs debe ser un entero positivo

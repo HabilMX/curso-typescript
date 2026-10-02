@@ -1,0 +1,22 @@
+{
+  "name": "revisor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compilar": "tsc",
+    "verificar": "tsc --noEmit",
+    "arrancar": "node dist/main.js",
+    "probar": "npm run compilar && node --test \"dist/**/*.test.js\"",
+    "lint": "eslint src",
+    "formato": "prettier --check src"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "eslint": "10.11.0",
+    "prettier": "3.9.9",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript-eslint": "8.71.0"
+  }
+}

@@ -1,0 +1,1 @@
+fig06_06.ts(3,10): error TS18046: 'valor' is of type 'unknown'.

@@ -1,0 +1,1 @@
+fig08_06.ts(8,9): error TS2345: Argument of type '"/api/estado"' is not assignable to parameter of type 'Ruta'.

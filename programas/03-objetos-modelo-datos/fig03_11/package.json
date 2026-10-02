@@ -1,0 +1,10 @@
+{
+  "name": "revisor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compilar": "tsc",
+    "verificar": "tsc --noEmit",
+    "arrancar": "node dist/main.js"
+  }
+}

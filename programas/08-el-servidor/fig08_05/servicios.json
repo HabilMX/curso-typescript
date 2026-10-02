@@ -1,0 +1,5 @@
+[
+  { "nombre": "ejemplo", "url": "https://example.com", "timeoutMs": 3000 },
+  { "nombre": "node", "url": "https://nodejs.org", "timeoutMs": 3000 },
+  { "nombre": "local-apagado", "url": "http://127.0.0.1:8099", "timeoutMs": 1000 }
+]

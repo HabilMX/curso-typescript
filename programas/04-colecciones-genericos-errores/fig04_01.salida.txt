@@ -1,0 +1,2 @@
+cantidad: 3
+catálogo, pagos, inventario

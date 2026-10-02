@@ -1,0 +1,4 @@
+estados: 2
+catálogo existe: true
+inventario: sin resultado
+nombres únicos: catálogo, pagos

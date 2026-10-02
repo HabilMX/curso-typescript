@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "types": ["node"],
+    "lib": ["ES2022", "DOM"],
+    "jsx": "react-jsx",
+    "sourceMap": true
+  },
+  "include": ["src"]
+}

@@ -1,0 +1,59 @@
+$ cd fig09_05
+$ npm run verificar
+> verificar
+> tsc --noEmit
+$ npm run lint
+> lint
+> eslint src
+$ npm run formato
+> formato
+> prettier --check src
+
+Checking formatting...
+All matched files use Prettier code style!
+$ npm run probar
+> probar
+> npm run compilar && node --test "dist/**/*.test.js"
+
+
+> compilar
+> tsc
+
+✔ leerPuerto: sin variable usa 3000 (0.5965ms)
+✔ leerPuerto: un puerto válido (0.069125ms)
+✔ leerPuerto: 65535 es el límite (0.053416ms)
+✔ leerPuerto: 65536 se pasa del límite (0.111167ms)
+✔ leerPuerto: 0 no es un puerto (0.076833ms)
+✔ leerPuerto: un decimal se rechaza (0.056958ms)
+✔ leerPuerto: texto se rechaza (0.077583ms)
+✔ leerPuerto: la cadena vacía se rechaza (0.061083ms)
+✔ esReportePublico: un reporte con las dos variantes (0.642125ms)
+✔ esReportePublico: null (0.076959ms)
+✔ esReportePublico: estados no es un arreglo (0.1285ms)
+✔ esReportePublico: un estado con un tipo desconocido (0.741875ms)
+✔ esReportePublico: codigoHttp llega como texto (0.060958ms)
+✔ muestra Cargando mientras la API no responde y luego las filas (18.194375ms)
+✔ un detalle con HTML se muestra como texto y no crea elementos (3.132041ms)
+✔ muestra el error y se recupera al pulsar Actualizar (4.856ms)
+✔ al desmontar cancela la solicitud en curso (1.096125ms)
+✔ cargarReporte: devuelve el reporte cuando la API responde con el contrato (21.967625ms)
+✔ cargarReporte: rechaza un código HTTP que no es 2xx (8.867708ms)
+✔ cargarReporte: rechaza un JSON que no cumple el contrato (3.011083ms)
+✔ el paquete que sirve el servidor pinta el reporte en una página real (142.25275ms)
+✔ disponible conserva código y duración (0.3745ms)
+✔ falla conserva detalle (0.051708ms)
+✔ el reporte público no publica la URL ni el tiempo límite (0.32275ms)
+✔ GET /api/estados revisa destinos reales y publica el reporte (178.837542ms)
+✔ las rutas desconocidas, los métodos y los errores internos responden con su código (10.282458ms)
+✔ una ruta que no se puede analizar responde 404 y no derriba el servidor (5.185333ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 532.285292
+$ npm run empaquetar
+> empaquetar
+> esbuild src/panel/cliente.tsx src/panel/panel.css --bundle --minify --format=iife --log-level=warning --outdir=dist/publico

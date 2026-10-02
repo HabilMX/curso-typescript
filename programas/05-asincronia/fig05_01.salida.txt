@@ -1,0 +1,4 @@
+inicio síncrono
+fin síncrono
+microtarea de promesa
+tarea de temporizador

@@ -1,0 +1,12 @@
+[
+  {
+    "nombre": "catálogo",
+    "url": "https://catalogo.example",
+    "timeoutMs": 1500
+  },
+  {
+    "nombre": "pagos",
+    "url": "https://pagos.example",
+    "timeoutMs": 3000
+  }
+]

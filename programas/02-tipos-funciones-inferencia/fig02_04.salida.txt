@@ -1,0 +1,2 @@
+catálogo: rápido
+pagos: lento
