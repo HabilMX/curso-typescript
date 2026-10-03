@@ -1,0 +1,59 @@
+# Estado de las traducciones. El ESPAÑOL es la fuente: todo se traduce desde ahí.
+#
+# La columna sha256 guarda la huella del archivo en español DEL QUE se tradujo.
+# Si el español cambia, su huella cambia y la traducción queda marcada como
+# vencida. Así la desincronización se detecta sola en vez de descubrirse meses
+# después leyendo una versión vieja.
+#
+# Se actualiza con:  ./registrar-traduccion.sh <archivo> <idioma>
+# Se comprueba con:  ./verificar-traducciones.sh
+#
+# archivo	idioma	sha256_del_español	fecha
+00-que-es-typescript.md	en	0f9419a4601177c893431bc4e89af1cf3b6d9421b088aa7eb4f85b8d7686f2ce	2026-10-02
+00-que-es-typescript.md	fr	0f9419a4601177c893431bc4e89af1cf3b6d9421b088aa7eb4f85b8d7686f2ce	2026-10-02
+00-que-es-typescript.md	pt	0f9419a4601177c893431bc4e89af1cf3b6d9421b088aa7eb4f85b8d7686f2ce	2026-10-02
+00-que-es-typescript.md	bg	0f9419a4601177c893431bc4e89af1cf3b6d9421b088aa7eb4f85b8d7686f2ce	2026-10-02
+01-instalacion.md	en	803df9bb5fabf042a14c777f9e3ce74927ba983bbed9ccab55d117253f259b82	2026-10-02
+01-instalacion.md	fr	803df9bb5fabf042a14c777f9e3ce74927ba983bbed9ccab55d117253f259b82	2026-10-02
+01-instalacion.md	pt	803df9bb5fabf042a14c777f9e3ce74927ba983bbed9ccab55d117253f259b82	2026-10-02
+01-instalacion.md	bg	803df9bb5fabf042a14c777f9e3ce74927ba983bbed9ccab55d117253f259b82	2026-10-02
+02-tipos-funciones-inferencia.md	en	e5b06110a38e52e1fcaec996966d607a51afa475f3705cc47090ffd605bd550e	2026-10-02
+02-tipos-funciones-inferencia.md	fr	e5b06110a38e52e1fcaec996966d607a51afa475f3705cc47090ffd605bd550e	2026-10-02
+02-tipos-funciones-inferencia.md	pt	e5b06110a38e52e1fcaec996966d607a51afa475f3705cc47090ffd605bd550e	2026-10-02
+02-tipos-funciones-inferencia.md	bg	e5b06110a38e52e1fcaec996966d607a51afa475f3705cc47090ffd605bd550e	2026-10-02
+03-objetos-modelo-datos.md	en	3f0887b287f6ff84720a21b9167cbcbfeb823171ed1ef4aaa59bcb671e6e6a35	2026-10-02
+03-objetos-modelo-datos.md	fr	3f0887b287f6ff84720a21b9167cbcbfeb823171ed1ef4aaa59bcb671e6e6a35	2026-10-02
+03-objetos-modelo-datos.md	pt	3f0887b287f6ff84720a21b9167cbcbfeb823171ed1ef4aaa59bcb671e6e6a35	2026-10-02
+03-objetos-modelo-datos.md	bg	3f0887b287f6ff84720a21b9167cbcbfeb823171ed1ef4aaa59bcb671e6e6a35	2026-10-02
+04-colecciones-genericos-errores.md	en	6fac06036bf1531c5291ac6d0facdae8793c009aae537c7359f1c8d3a37b0187	2026-10-02
+04-colecciones-genericos-errores.md	fr	6fac06036bf1531c5291ac6d0facdae8793c009aae537c7359f1c8d3a37b0187	2026-10-02
+04-colecciones-genericos-errores.md	pt	6fac06036bf1531c5291ac6d0facdae8793c009aae537c7359f1c8d3a37b0187	2026-10-02
+04-colecciones-genericos-errores.md	bg	6fac06036bf1531c5291ac6d0facdae8793c009aae537c7359f1c8d3a37b0187	2026-10-02
+05-asincronia.md	en	ed2bd88a5997b89844d101d4ee587e0d2f5aa0bd372a3dca04b32b91be05886a	2026-10-02
+05-asincronia.md	fr	ed2bd88a5997b89844d101d4ee587e0d2f5aa0bd372a3dca04b32b91be05886a	2026-10-02
+05-asincronia.md	pt	ed2bd88a5997b89844d101d4ee587e0d2f5aa0bd372a3dca04b32b91be05886a	2026-10-02
+05-asincronia.md	bg	ed2bd88a5997b89844d101d4ee587e0d2f5aa0bd372a3dca04b32b91be05886a	2026-10-02
+06-datos-de-fuera.md	en	3c9fb81ca3fd083dfbaf1f30b28f924c89cddb4bea923d3a5ca3aa207a8c0ba5	2026-10-02
+06-datos-de-fuera.md	fr	3c9fb81ca3fd083dfbaf1f30b28f924c89cddb4bea923d3a5ca3aa207a8c0ba5	2026-10-02
+06-datos-de-fuera.md	pt	3c9fb81ca3fd083dfbaf1f30b28f924c89cddb4bea923d3a5ca3aa207a8c0ba5	2026-10-02
+06-datos-de-fuera.md	bg	3c9fb81ca3fd083dfbaf1f30b28f924c89cddb4bea923d3a5ca3aa207a8c0ba5	2026-10-02
+07-modulos-pruebas-calidad.md	en	1f67d83adf0c97133d284304181ead7bebad3addb3b725d72c67b43c61f0d648	2026-10-02
+07-modulos-pruebas-calidad.md	fr	1f67d83adf0c97133d284304181ead7bebad3addb3b725d72c67b43c61f0d648	2026-10-02
+07-modulos-pruebas-calidad.md	pt	1f67d83adf0c97133d284304181ead7bebad3addb3b725d72c67b43c61f0d648	2026-10-02
+07-modulos-pruebas-calidad.md	bg	1f67d83adf0c97133d284304181ead7bebad3addb3b725d72c67b43c61f0d648	2026-10-02
+08-el-servidor.md	en	a3dc11405fffa5786840d7f36d65d73eeb6c18f751d6e217ec0bab2e8f2c7908	2026-10-02
+08-el-servidor.md	fr	a3dc11405fffa5786840d7f36d65d73eeb6c18f751d6e217ec0bab2e8f2c7908	2026-10-02
+08-el-servidor.md	pt	a3dc11405fffa5786840d7f36d65d73eeb6c18f751d6e217ec0bab2e8f2c7908	2026-10-02
+08-el-servidor.md	bg	a3dc11405fffa5786840d7f36d65d73eeb6c18f751d6e217ec0bab2e8f2c7908	2026-10-02
+09-la-pantalla.md	en	4c28e0ae234cba8fd070ab274f47daf3a25de9b25cadb038c8d540e142c21699	2026-10-02
+09-la-pantalla.md	fr	4c28e0ae234cba8fd070ab274f47daf3a25de9b25cadb038c8d540e142c21699	2026-10-02
+09-la-pantalla.md	pt	4c28e0ae234cba8fd070ab274f47daf3a25de9b25cadb038c8d540e142c21699	2026-10-02
+09-la-pantalla.md	bg	4c28e0ae234cba8fd070ab274f47daf3a25de9b25cadb038c8d540e142c21699	2026-10-02
+bitacora.md	en	8f1fe8b3b8c5b455ed4fb40e4929275a52f119c763cc5e98bcde4fd04b16abd6	2026-10-02
+bitacora.md	fr	8f1fe8b3b8c5b455ed4fb40e4929275a52f119c763cc5e98bcde4fd04b16abd6	2026-10-02
+bitacora.md	pt	8f1fe8b3b8c5b455ed4fb40e4929275a52f119c763cc5e98bcde4fd04b16abd6	2026-10-02
+bitacora.md	bg	8f1fe8b3b8c5b455ed4fb40e4929275a52f119c763cc5e98bcde4fd04b16abd6	2026-10-02
+README.md	en	023c37b9983c8ab0cbd2b3b0409981d27f8801e20f1e43d2bf7e08c26773a369	2026-10-02
+README.md	fr	023c37b9983c8ab0cbd2b3b0409981d27f8801e20f1e43d2bf7e08c26773a369	2026-10-02
+README.md	pt	023c37b9983c8ab0cbd2b3b0409981d27f8801e20f1e43d2bf7e08c26773a369	2026-10-02
+README.md	bg	023c37b9983c8ab0cbd2b3b0409981d27f8801e20f1e43d2bf7e08c26773a369	2026-10-02

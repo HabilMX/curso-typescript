@@ -7,11 +7,15 @@
 **Cada programa de este curso se compila con `tsc` en modo estricto y se ejecuta automáticamente en cada cambio; el sello verde lo comprueba y cualquiera puede ver la corrida.**
 Haz clic en el sello para abrir la última corrida y ver, paso por paso, qué se ejecutó y qué salió.
 
-> Por ahora el curso está en español; las traducciones vienen en camino.
+> El curso está en cinco idiomas: español (el original), inglés, francés, portugués de Brasil y búlgaro.
 
 ## Dónde está el contenido
 
 - **[Español — el curso completo](es/README.md)** ← empieza aquí
+- **[English — the full course](en/README.md)**
+- **[Français — le cours complet](fr/README.md)**
+- **[Português (Brasil) — o curso completo](pt/README.md)**
+- **[Български — пълният курс](bg/README.md)**
 - **[`programas/`](programas/)** — todos los programas del curso, listos para ejecutar
 
 ## Para quién es
@@ -79,7 +83,7 @@ Cada programa es un archivo `figNN_NN.ts` (o `.tsx`) dentro de la carpeta de su 
 | | |
 |---|---|
 | `es/` | el curso en español, una lección por archivo |
-| `en/`, `fr/`, `pt/`, `bg/` | **futuras:** las traducciones todavía no existen |
+| `en/`, `fr/`, `pt/`, `bg/` | las traducciones (inglés, francés, portugués de Brasil y búlgaro), una lección por archivo |
 | `programas/` | los programas de las lecciones (uno por archivo, con su salida esperada) |
 | `herramientas/` | los guiones que verifican el curso (ver abajo) y la versión fijada de TypeScript |
 | `.github/workflows/verificar.yml` | la verificación automática que muestra el sello |
@@ -111,6 +115,6 @@ Las lecciones usan módulos ESM (`"type": "module"`): los `import` relativos lle
 ## Reglas del repositorio
 
 - **Licencia CC BY-SA 4.0** (ver `LICENSE.md`): el material es público y se puede reusar citando la fuente.
-- **Multiidioma:** `es/` es el original; `en/`, `fr/`, `pt/` y `bg/` serán traducciones.
+- **Multiidioma:** `es/` es el original; `en/`, `fr/`, `pt/` y `bg/` son traducciones, y `herramientas/verificar-traducciones.sh` avisa cuando alguna quedó vieja respecto al español.
 - `./verificar-publicable.sh` antes de publicar. Falla cerrado (si no pudo buscar, sale en error, no en verde) y trae autoprueba: siembra un patrón y exige detectarlo.
 - Sin emojis en los títulos de las lecciones.
