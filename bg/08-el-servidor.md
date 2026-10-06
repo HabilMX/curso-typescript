@@ -1605,3 +1605,5 @@ const detener = (senal: string): void => {
 - [TypeScript Handbook: Narrowing](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) — официална документация за стесняването на дискриминирани обединения, проверките на незадължителни стойности и изчерпателността с `never`; консултирано на 2 октомври 2026 г.
 
 - [MDN: HTTP response status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status) — справочник за кодовете на състоянието на HTTP и значението им за клиентите и сървърите; консултирано на 2 октомври 2026 г.
+
+- [Сигурност на API за CTO: идентичност, gateway и токени, без сляпо доверие](https://www.habil.mx/bg/blog/api-security-cto-identity-gateway-tokens/) — статия за това, защо идентификационните данни не бива да се предават в URL адреса (остават записани в журналите) и как всяка услуга проверява, че токенът е предназначен за нея; консултирано на 6 октомври 2026 г.

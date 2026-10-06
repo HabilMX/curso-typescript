@@ -1605,3 +1605,5 @@ O `.catch(...)` que `main.ts` encadeia no final da expressão é conservado tal 
 - [TypeScript Handbook: Narrowing](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) — documentação oficial sobre a redução de uniões discriminadas, verificações de valores opcionais e exaustividade com `never`; consultado em 2 de outubro de 2026.
 
 - [MDN: Códigos de status de respostas HTTP](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Reference/Status) — referência sobre os códigos de status HTTP e seu significado para clientes e servidores; consultado em 2 de outubro de 2026.
+
+- [Segurança de APIs para o CTO: identidade, gateway e tokens, sem confiar às cegas](https://www.habil.mx/pt/blog/seguranca-de-apis-cto-identidade-gateway-tokens/) — artigo sobre por que uma credencial não deve ir na URL (ela fica registrada nos logs) e sobre como cada serviço verifica que o token era destinado a ele; consultado em 6 de outubro de 2026.

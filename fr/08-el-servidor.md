@@ -1605,3 +1605,5 @@ Le `.catch(...)` que `main.ts` enchaîne à la fin de l'expression est conservé
 - [TypeScript Handbook: Narrowing](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) — documentation officielle sur la réduction des unions discriminées, les vérifications de valeurs optionnelles et l'exhaustivité avec `never` ; consulté le 2 octobre 2026.
 
 - [MDN : codes de réponse HTTP](https://developer.mozilla.org/fr/docs/Web/HTTP/Reference/Status) — référence sur les codes d'état HTTP et leur signification pour les clients et les serveurs ; consulté le 2 octobre 2026.
+
+- [Sécurité des API pour le CTO : identité, passerelle et jetons, sans faire confiance aveuglément](https://www.habil.mx/fr/blog/securite-api-cto-identite-passerelle-jetons/) — article sur la raison pour laquelle un identifiant ne doit pas figurer dans l'URL (il se retrouve dans les journaux) et sur la façon dont chaque service vérifie que le jeton lui était destiné ; consulté le 6 octobre 2026.

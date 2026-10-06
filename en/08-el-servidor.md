@@ -1605,3 +1605,5 @@ The `.catch(...)` that `main.ts` chains at the end of the expression is kept as 
 - [TypeScript Handbook: Narrowing](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) — official documentation on narrowing discriminated unions, checks of optional values, and exhaustiveness with `never`; accessed on October 2, 2026.
 
 - [MDN: HTTP response status codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status) — reference on HTTP status codes and their meaning for clients and servers; accessed on October 2, 2026.
+
+- [API security for the CTO: identity, gateway and tokens, without trusting blindly](https://www.habil.mx/en/blog/api-security-cto-identity-gateway-tokens/) — article on why a credential must not travel in the URL (it ends up written in the logs) and on how each service checks that the token was addressed to it; accessed on October 6, 2026.
