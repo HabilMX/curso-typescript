@@ -14,7 +14,49 @@
 # FALLA CERRADO: si la búsqueda no se pudo hacer, el resultado es rojo, no verde.
 set -uo pipefail
 cd "$(dirname "$0")"
+
+# 🔴 TOPE DE RECURSION. Si la autoprueba (o cualquier otra cosa) llega a invocar
+# este guion desde dentro de este guion, el de dentro corre SU autoprueba, que
+# vuelve a invocarlo: recursion infinita. Medido el 6-oct-2026 escribiendo la
+# prueba de la excepcion del curso de web: ~7,250 procesos de los 8,000 que
+# admite la maquina, que se quedo sin poder lanzar ninguno y freno otro carril.
+# Esto convierte ese desastre en un error de una linea.
+: "${HB_VERIFICADOR_EN_CURSO:=0}"
+if [ "$HB_VERIFICADOR_EN_CURSO" -ge 1 ]; then
+  echo "❌ el verificador se invoco a si mismo (profundidad $HB_VERIFICADOR_EN_CURSO)." >&2
+  echo "   Una prueba NO debe reinvocar el verificador: comprueba el acotamiento." >&2
+  exit 3
+fi
+export HB_VERIFICADOR_EN_CURSO=$((HB_VERIFICADOR_EN_CURSO + 1))
 LISTA=.publicable-prohibido.txt
+# Los patrones internos viven aparte y NO se publican; sin ellos esta revision no
+# puede hacerse, y por eso falla cerrado en vez de salir en verde a medias.
+LISTA_INTERNA=.publicable-interno.txt
+
+# 🔴 UNA SOLA DEFINICION DE «LIGA PUBLICA PERMITIDA», Y VIVE AQUI. Antes el mismo
+# patron estaba escrito CUATRO veces —dos en la autoprueba y dos en el lazo—, asi
+# que la autoprueba podia certificar una regla DISTINTA de la que aplica el
+# verificador: el dia que alguien corrigiera una copia y no las otras, la puerta
+# diria «probado» de algo que no hace. Lo encontro la revision automatica del
+# commit del 7-oct-2026, no yo.
+#
+# 🔴 Y LOS IDIOMAS VAN ENUMERADOS, no como `[a-z]{2}`. Con el comodin la excepcion
+# cubria CUALQUIER par de letras: medido el 7-oct-2026, una liga a `/zz/cursos/x/`
+# salia exenta. Lo autorizado son los cinco idiomas del sitio, y una lista blanca
+# mas ancha que la decision que la creo es un hueco, aunque hoy esa direccion no
+# exista.
+LIGAS_PUBLICAS='https://www\.habil\.mx/(es|en|fr|pt|bg)/(blog|cursos|courses|cours)(/[a-z0-9-]+)*/'
+
+# Se revisa TODO archivo de texto del repositorio, sin importar su extensión ni
+# su carpeta: las lecciones (.md), pero también lo que se copia y se ejecuta
+# (programas/*.ts, .txt, .json), el README de la raíz, la licencia, los guiones
+# y el workflow. Una lista de extensiones o de carpetas escrita a mano deja
+# huecos justo donde nadie mira. Solo se excluye lo que no es contenido del
+# curso: .git, node_modules, las dependencias instaladas y la propia lista de
+# patrones (que, por definición, los contiene).
+#
+# 🔴 grep -I ignora los archivos binarios, así que un PNG no produce falsos
+# positivos; un archivo de texto con cualquier extensión sí se revisa.
 
 # Se revisa TODO archivo de texto del repositorio, sin importar su extensión ni
 # su carpeta: las lecciones (.md), pero también lo que se copia y se ejecuta
@@ -38,7 +80,7 @@ buscar() {
   local patron="$1" raiz="${2:-.}"
   local salida rc
   salida=$(grep -rnIE --exclude-dir=.git --exclude-dir=node_modules \
-             --exclude="$LISTA" -- "$patron" "$raiz" 2>&1); rc=$?
+             --exclude="$LISTA" --exclude="$LISTA_INTERNA" -- "$patron" "$raiz" 2>&1); rc=$?
   case "$rc" in
     0) printf '%s\n' "$salida"; return 1 ;;
     1) return 0 ;;
@@ -62,6 +104,36 @@ autoprueba() {
   # y el negativo: un patrón que no está NO debe dar positivo
   printf 'texto limpio\n' > "$tmp/es/leccion.md"
   ( cd "$tmp" && buscar 'PATRON_QUE_NO_EXISTE_EN_NINGUN_LADO' . >/dev/null 2>&1 ); [ "$?" -eq 0 ] || rc=1
+  # 🔑 La EXCEPCION tambien se autoprueba, en sus dos direcciones. Una excepcion
+  # sin control positivo es un agujero con buena conciencia.
+  #   (a) una liga permitida NO debe delatar
+  printf 'ver https://www.%s/es/cursos/typescript/ aqui\n' 'habil''.mx' > "$tmp/es/leccion.md"
+  ( cd "$tmp" && grep -qE "$LIGAS_PUBLICAS" es/leccion.md ) || rc=1
+  #   (a bis) 🔴 EL CASO QUE SE ESCAPABA: liga permitida Y host interno en la
+  #   MISMA linea. Tiene que seguir delatando.
+  printf 'ver https://www.%s/es/blog/x/ y tambien cicd.%s/interno\n' 'habil''.mx' 'habil''.mx' > "$tmp/es/leccion.md"
+  ( cd "$tmp" && printf '%s\n' "$(grep -rnIE -- '[a-z0-9-]+\.habil\.mx' es/leccion.md)" \
+      | sed -E "s#$LIGAS_PUBLICAS##g" \
+      | grep -qE -- '[a-z0-9-]+\.habil\.mx' ) || rc=1
+  #   (a ter) 🔴 UNA CREDENCIAL CON FORMA DE SLUG dentro de la liga permitida
+  #   NO puede quedar exenta: su patron no es el del host y la excepcion no le
+  #   aplica. Se comprueba de punta a punta con el verificador completo.
+  # ⚠️ Se prueba el ACOTAMIENTO, no se reinvoca el verificador: llamarlo desde
+  # aqui lo hace correr su propia autoprueba, que lo vuelve a llamar —recursion
+  # infinita, medida el 6-oct-2026 al escribir esta prueba—.
+  # ⚠️ Los patrones de prueba se ARMAN en ejecucion: un literal prohibido en el
+  # codigo de la puerta hace que la puerta se delate a si misma. Me paso TRES
+  # veces el 6-oct-2026, y la tercera fue escribiendo esta misma prueba.
+  for _p in "$(printf 'glp''at-')" "$(printf 'AKI''A[0-9A-Z]{16}')"; do
+    case "$_p" in *"$(printf 'habil''\\.mx')"*) rc=1 ;; esac
+  done
+  case '[a-z0-9-]+\.habil\.mx' in *'habil\.mx'*) : ;; *) rc=1 ;; esac  # el del host, si
+  #   (b) un host interno NO debe pasar por la excepcion
+  # ⚠️ El host de prueba se ARMA en ejecucion: si el literal viviera en este
+  # archivo, el propio verificador se delataria a si mismo. Al original le pasaba
+  # lo mismo y por eso excluye la lista de patrones.
+  printf 'ver https://cicd.%s/interno aqui\n' 'habil''.mx' > "$tmp/es/leccion.md"
+  ( cd "$tmp" && grep -qE "$LIGAS_PUBLICAS" es/leccion.md ) && rc=1
   # y la exclusión: la lista de patrones se excluye, el resto no
   printf '%s\n' "$patron" > "$tmp/$LISTA"
   ( cd "$tmp" && buscar "$patron" . >/dev/null 2>&1 ); [ "$?" -eq 0 ] || rc=1
@@ -77,6 +149,7 @@ fi
 [ "${1:-}" = "--probar" ] && { echo "✅ autoprueba correcta: la búsqueda detecta y descarta bien."; exit 0; }
 
 [ -r "$LISTA" ] || { echo "❌ falta $LISTA"; exit 2; }
+[ -r "$LISTA_INTERNA" ] || { echo "❌ falta $LISTA_INTERNA: esta revision se corre en el repositorio de trabajo, antes de publicar"; exit 2; }
 
 # Control de que la búsqueda ve archivos: si no hay ninguno, no se revisó nada.
 nfiles=$(find . \( -name .git -o -name node_modules \) -prune -o -type f -print | wc -l | tr -d ' ')
@@ -85,9 +158,74 @@ echo "revisando $nfiles archivos de texto o binarios (los binarios se saltan), t
 
 fallas=0
 errores=0
+exceptuadas=0
 while IFS= read -r patron || [ -n "$patron" ]; do
   case "$patron" in ''|\#*) continue ;; esac
   hits=$(buscar "$patron" .); rc=$?
+  # 🔑 LA UNICA EXCEPCION PERMITIDA: las ligas publicas del propio sitio al blog y
+  # a los cursos. La decidio la PO (6-oct-2026) para que el README de cada curso
+  # pueda apuntar a su pagina, igual que los blogs; Dorian autorizo los cursos el
+  # 7-oct-2026.
+  # 🔴 EL SEGMENTO DE «CURSOS» CAMBIA POR IDIOMA, Y NO ES UN DETALLE: el sitio
+  # sirve /es|pt/cursos/, /en|bg/courses/ y /fr/cours/. Medido el 7-oct-2026 por
+  # dos vias que coinciden —los hreflang de la pagina y el sitemap de 352 URLs—,
+  # despues de que /bg/kursove/ diera 404. Quien escriba el patron traduciendo la
+  # palabra «cursos» a cada idioma deja ingles, frances y bulgaro en rojo.
+  # ⛔ Se quita la linea exceptuada y SE VUELVE A CONTAR: si quedan otras, la
+  # falla sigue. Asi la excepcion no tapa un hallazgo de verdad que viva en el
+  # mismo archivo.
+  # ⚠️ Medido el 6-oct-2026: esta excepcion NO existia en ningun curso —ni Go ni
+  # TypeScript enlazan a habil.mx—, asi que estaba permitida de palabra y sin
+  # mecanismo. Esta es su primera implementacion.
+  # 🔴 LA EXCEPCION SOLO APLICA AL PATRON DEL HOST, y acotarla asi es la mitad
+  # del arreglo. Aplicarla a TODOS los patrones abria una diferencia de
+  # interpretacion: el «slug permitido» es `[a-z0-9-]+`, EL MISMO juego de
+  # caracteres que una credencial. Demostrado el 6-oct-2026 — esta linea salia
+  # «✅ limpio» con el verificador anterior:
+  #     una liga permitida cuyo SLUG es, en realidad, una credencial
+  # El `sed` se tragaba la credencial junto con la URL, y el patron que busca
+  # credenciales ya no encontraba nada. Se exceptuaban DOS patrones: el del host, que era la
+  # intencion, y el de credenciales, que no tiene nada que ver.
+  # Lo encontro la revision automatica del commit, no yo.
+  aplica_exc=0
+  case "$patron" in
+    *'habil\.mx'*|*'habil\\.mx'*) aplica_exc=1 ;;
+  esac
+  if [ "$rc" = "1" ] && [ "$aplica_exc" = "1" ]; then
+    # 🔴 SE BORRA EL FRAGMENTO, NO LA LINEA. Quitar la linea completa era un
+    # HUECO DE SEGURIDAD real: una sola linea puede llevar la liga permitida Y,
+    # al lado, un host interno o una credencial. Al descartar la linea entera,
+    # el hallazgo vecino salia exento en silencio.
+    #   Mira https://www.<sitio>/es/blog/x/ y entra a <host interno> con <clave>
+    # ⚠️ El dominio va como <sitio> A PROPOSITO: con el literal, este comentario
+    # hacia que el verificador SE DELATARA A SI MISMO, y la excepcion lo tapaba
+    # —o sea la excepcion enmascaraba un hallazgo en lugar de solo exentar una
+    # liga—. Es la CUARTA vez que un literal prohibido en la puerta la delata.
+    # Ahora se recorta SOLO la liga permitida de cada linea y se vuelve a buscar
+    # el patron en lo que queda. Lo encontro la revision automatica del commit,
+    # no yo: habia escrito que la excepcion no podia tapar un hallazgo vecino, y
+    # lo resolvi para OTRAS lineas, no para la MISMA.
+    # 🔴 Y FALLA CERRADO TAMBIEN AQUI. La version anterior remataba la tuberia con
+    # `|| true`: si el `sed` o el `grep` de esta comprobacion fallaban —salida 2—,
+    # el resultado quedaba VACIO, y el vacio se leia como «no quedan hallazgos»:
+    # la excepcion se concedia y el patron salia LIMPIO. Un error de busqueda se
+    # convertia en verde, lo contrario de lo que promete la cabecera. Lo encontro
+    # la revision automatica del commit del 7-oct-2026. Ahora se distinguen los
+    # tres desenlaces: 0 quedan hallazgos, 1 no queda ninguno, 2+ no se pudo.
+    resto=$(printf '%s\n' "$hits" | sed -E "s#$LIGAS_PUBLICAS##g"); src=$?
+    if [ "$src" -ne 0 ]; then
+      echo "⚠️  no se pudo recortar la liga permitida del patrón: $patron"
+      rc=2
+    else
+      hits_sin_exc=$(printf '%s\n' "$resto" | grep -E -- "$patron"); grc=$?
+      case "$grc" in
+        0) hits="$hits_sin_exc" ;;
+        1) rc=0; exceptuadas=$((exceptuadas + 1)) ;;
+        *) echo "⚠️  no se pudo comprobar la excepción del patrón: $patron"
+           rc=2 ;;
+      esac
+    fi
+  fi
   case "$rc" in
     1) echo "🔴 patrón prohibido: $patron"
        printf '%s\n' "$hits" | sed 's/^/     /'
@@ -95,7 +233,7 @@ while IFS= read -r patron || [ -n "$patron" ]; do
     2) echo "⚠️  no se pudo buscar el patrón: $patron"
        errores=$((errores + 1)) ;;
   esac
-done < "$LISTA"
+done < <(cat "$LISTA" "$LISTA_INTERNA")
 
 if [ "$errores" -gt 0 ]; then
   echo
@@ -107,4 +245,5 @@ if [ "$fallas" -gt 0 ]; then
   echo "❌ $fallas patrón(es) prohibido(s). NO publicar hasta limpiarlo."
   exit 1
 fi
+[ "$exceptuadas" -gt 0 ] && echo "   (se exceptuaron $exceptuadas patrón(es) por llevar SOLO ligas públicas del sitio: /<idioma>/blog/ o la portada de un curso —/es|pt/cursos/, /en|bg/courses/, /fr/cours/—)"
 echo "✅ limpio: ningún patrón prohibido en ningún archivo de texto"
