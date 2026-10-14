@@ -87,7 +87,7 @@ Cada programa es un archivo `figNN_NN.ts` (o `.tsx`) dentro de la carpeta de su 
 | `programas/` | los programas de las lecciones (uno por archivo, con su salida esperada) |
 | `herramientas/` | los guiones que verifican el curso (ver abajo) y la versión fijada de TypeScript |
 | `.github/workflows/verificar.yml` | la verificación automática que muestra el sello |
-| `verificar-publicable.sh` | revisa que el material no contenga rutas internas ni claves antes de publicarlo. Se corre en el repositorio de trabajo: lee una lista de patrones que no se publica, porque enumerarlos en claro delataría justo lo que protegen |
+
 | `LICENSE.md` | CC BY-SA 4.0 |
 
 Dentro de `herramientas/`:

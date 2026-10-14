@@ -9,3 +9,8 @@
 # Estos no son el lenguaje que se ensena, asi que no cuentan para esa medida.
 herramientas/*.sh linguist-detectable=false
 verificar-publicable.sh linguist-detectable=false
+
+# El guion de esa revision tampoco viaja: alla no puede correr -su lista interna no
+# se publica- y ademas describe como funciona la puerta: que busca, que exceptua y
+# donde falla cerrado. Vive en el repositorio de trabajo, que es donde se usa.
+verificar-publicable.sh export-ignore
