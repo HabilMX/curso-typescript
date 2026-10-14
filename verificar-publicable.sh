@@ -156,6 +156,8 @@ nfiles=$(find . \( -name .git -o -name node_modules \) -prune -o -type f -print 
 [ "$nfiles" -gt 0 ] || { echo "❌ no hay archivos que revisar"; exit 2; }
 echo "revisando $nfiles archivos de texto o binarios (los binarios se saltan), todas las carpetas"
 
+revisados=0
+
 fallas=0
 errores=0
 exceptuadas=0
@@ -226,6 +228,7 @@ while IFS= read -r patron || [ -n "$patron" ]; do
       esac
     fi
   fi
+  revisados=$((revisados + 1))
   case "$rc" in
     1) echo "🔴 patrón prohibido: $patron"
        printf '%s\n' "$hits" | sed 's/^/     /'
@@ -234,6 +237,18 @@ while IFS= read -r patron || [ -n "$patron" ]; do
        errores=$((errores + 1)) ;;
   esac
 done < <(cat "$LISTA" "$LISTA_INTERNA")
+
+# 🔴 CERO PATRONES REVISADOS NO ES «LIMPIO». Si las listas estan vacias o no se
+# pudieron leer, el lazo no itera ni una vez y el guion salia diciendo «limpio»
+# con exito: el falso verde mas caro posible, porque es la puerta de la
+# publicacion. Medido el 13-oct-2026 con las dos listas vacias: decia limpio y
+# salia 0. Ahora se exige haber revisado al menos un patron.
+if [ "${revisados:-0}" -eq 0 ]; then
+  echo
+  echo "❌ no se revisó ningún patrón: las listas están vacías o no se pudieron leer."
+  echo "   Falla cerrado: un cero de patrones no es un repositorio limpio."
+  exit 2
+fi
 
 if [ "$errores" -gt 0 ]; then
   echo
