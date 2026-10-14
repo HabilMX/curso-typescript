@@ -38,5 +38,8 @@ jobs:
       - name: Medir la profundidad (palabras de explicación)
         run: herramientas/medir-profundidad.sh
 
-      - name: Revisar que no haya material que no debe publicarse
-        run: ./verificar-publicable.sh
+      - name: Nota sobre la revisión previa a publicar
+        run: |
+          echo "La revisión de material no publicable (rutas internas, nombres reservados,"
+          echo "direcciones de la infraestructura) se corre ANTES de publicar, con la lista"
+          echo "de patrones que vive en el repositorio de trabajo y no se publica."
