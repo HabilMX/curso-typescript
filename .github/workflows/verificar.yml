@@ -35,6 +35,9 @@ jobs:
       - name: Comprobar la plantilla de cada lección
         run: herramientas/verificar-plantilla.sh
 
+      - name: El medidor de profundidad sabe fallar (control positivo)
+        run: herramientas/autoprueba-medir-profundidad.sh
+
       - name: Medir la profundidad (palabras de explicación)
         run: herramientas/medir-profundidad.sh
 

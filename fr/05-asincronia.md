@@ -1,4 +1,4 @@
-# Leçon 5 — Asynchronisme : qu'il vérifie tout à la fois
+# Leçon 5 — Asynchronisme : tout vérifier en même temps
 
 **Durée :** 2 × 45 min
 

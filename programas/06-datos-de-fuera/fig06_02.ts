@@ -13,6 +13,16 @@ function esRegistro(valor: unknown): valor is Record<string, unknown> {
   return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
+// La URL nunca se repite en un mensaje: puede traer usuario, clave o un token.
+function tieneCredenciales(url: string): boolean {
+  try {
+    const { username, password } = new URL(url);
+    return username !== "" || password !== "";
+  } catch {
+    return false;
+  }
+}
+
 function leerServicio(valor: unknown): Resultado<Servicio> {
   if (!esRegistro(valor)) {
     return { ok: false, detalle: "debe ser un objeto" };
@@ -26,6 +36,10 @@ function leerServicio(valor: unknown): Resultado<Servicio> {
 
   if (typeof url !== "string" || url.trim() === "") {
     return { ok: false, detalle: "url debe ser texto no vacío" };
+  }
+
+  if (tieneCredenciales(url)) {
+    return { ok: false, detalle: "la URL no debe llevar usuario ni clave" };
   }
 
   if (

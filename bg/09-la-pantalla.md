@@ -20,7 +20,7 @@
 
 До предишния урок `revisor` вече върши трудната работа: валидира конфигурация, проверява истински услуги едновременно, представя отказите като данни, излага HTTP API и се затваря коректно. И все пак JSON отговорът е интерфейс, измислен за друга програма. Човек, който трябва да узнае дали `pagos` се проваля, може да отвори маршрута, да прочете дълга структура и да търси на око важните полета. Това върши работа за диагностика; не е добър екран за експлоатация.
 
-Таблото променя въпроса от „какви данни има системата?“ на „какво трябва да види някой, за да вземе решение?“. Отчетът трябва да покаже първо името на услугата, дали е налична или в отказ, и данната, която обяснява това заключение: HTTP код и продължителност за наличен отговор, подробност за отказ. Трябва да казва кога още зарежда и какво се е случило, когато зареждането се е провалило, защото екран, който остава празен, не разграничава „няма услуги“ от „не можах да попитам“. И трябва да се обновява сам, защото отчет за наличност, който остарява, е по-лош от липсата на отчет.
+Таблото променя въпроса от „какви данни има системата?“ на „какво трябва да види някой, за да вземе решение?“. Отчетът трябва да покаже първо името на услугата, дали е налична или в отказ, и данните, които обясняват това заключение: HTTP код и продължителност за наличен отговор, подробност за отказ. Трябва да казва кога още зарежда и какво се е случило, когато зареждането се е провалило, защото екран, който остава празен, не разграничава „няма услуги“ от „не можах да попитам“. И трябва да се обновява сам, защото отчет за наличност, който остарява, е по-лош от липсата на отчет.
 
 React помага да се опише този екран като компоненти. **Компонентът** е функция, която получава свойства и връща описание на интерфейс. React се грижи да превърне това описание в елементи на браузъра и да ги обновява, когато данните се променят. Това не замества правилата, построени в предишните уроци: таблото трябва да консумира вече решен договор, а не да измисля само какви кодове са успешни, какво означава таймаут или как се валидира конфигурацията.
 
@@ -1541,6 +1541,23 @@ export function esRegistro(valor: unknown): valor is Record<string, unknown> {
   return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
+// La URL nunca se repite en un mensaje: puede traer usuario, clave o un token.
+function revisarUrl(url: string): string | undefined {
+  let direccion: URL;
+
+  try {
+    direccion = new URL(url);
+  } catch {
+    return "la URL no es válida";
+  }
+
+  if (direccion.username !== "" || direccion.password !== "") {
+    return "la URL no debe llevar usuario ni clave";
+  }
+
+  return undefined;
+}
+
 function leerServicio(valor: unknown): Resultado<Servicio> {
   if (!esRegistro(valor)) {
     return { ok: false, detalle: "cada servicio debe ser un objeto" };
@@ -1558,6 +1575,12 @@ function leerServicio(valor: unknown): Resultado<Servicio> {
     timeoutMs <= 0
   ) {
     return { ok: false, detalle: "servicio incompleto o inválido" };
+  }
+
+  const problemaUrl = revisarUrl(url);
+
+  if (problemaUrl !== undefined) {
+    return { ok: false, detalle: problemaUrl };
   }
 
   return { ok: true, valor: { nombre, url, timeoutMs } };
@@ -1673,6 +1696,19 @@ import type { Estado, Servicio } from "./modelo.js";
 export type Respuesta = { readonly codigoHttp: number; readonly duracionMs: number };
 export type Consultar = (servicio: Servicio, senal: AbortSignal) => Promise<Respuesta>;
 
+// Un error de red puede traer la URL completa, con usuario, clave o token. El detalle
+// conserva el mensaje, pero cada URL queda solo con su esquema, servidor y ruta.
+function sinUrlCompleta(mensaje: string): string {
+  return mensaje.replace(/[a-z][a-z\d+.-]*:\/\/\S+/gi, (texto) => {
+    try {
+      const url = new URL(texto);
+      return `${url.protocol}//${url.host}${url.pathname}`;
+    } catch {
+      return "<URL>";
+    }
+  });
+}
+
 export async function revisarTodos(
   servicios: readonly Servicio[],
   consultar: Consultar,
@@ -1691,7 +1727,7 @@ export async function revisarTodos(
         return {
           servicio,
           tipo: "falla",
-          detalle: error instanceof Error ? error.message : "falla desconocida",
+          detalle: error instanceof Error ? sinUrlCompleta(error.message) : "falla desconocida",
         };
       }
     }),

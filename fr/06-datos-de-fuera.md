@@ -98,6 +98,16 @@ function esRegistro(valor: unknown): valor is Record<string, unknown> {
   return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
+// La URL nunca se repite en un mensaje: puede traer usuario, clave o un token.
+function tieneCredenciales(url: string): boolean {
+  try {
+    const { username, password } = new URL(url);
+    return username !== "" || password !== "";
+  } catch {
+    return false;
+  }
+}
+
 function leerServicio(valor: unknown): Resultado<Servicio> {
   if (!esRegistro(valor)) {
     return { ok: false, detalle: "debe ser un objeto" };
@@ -111,6 +121,10 @@ function leerServicio(valor: unknown): Resultado<Servicio> {
 
   if (typeof url !== "string" || url.trim() === "") {
     return { ok: false, detalle: "url debe ser texto no vacío" };
+  }
+
+  if (tieneCredenciales(url)) {
+    return { ok: false, detalle: "la URL no debe llevar usuario ni clave" };
   }
 
   if (
@@ -144,6 +158,8 @@ $ node fig06_02.js
 catálogo: 1500 ms
 inválido: timeoutMs debe ser un entero positivo
 ```
+
+`tieneCredenciales` rejette dès maintenant l'URL qui porte un utilisateur ou un mot de passe, avec un message fixe qui ne la répète pas. La figure 06_03 explique pourquoi un identifiant ne doit pas voyager dans l'URL.
 
 La fonction renvoie `Resultado<Servicio>` et ne lance pas d'exception pour une mauvaise configuration attendue. Cela permet à l'appelant de décider s'il faut arrêter le démarrage, afficher toutes les erreurs ou continuer avec une configuration par défaut. Pour une liste de cibles qui définit ce qui sera vérifié, arrêter le démarrage avec une explication vaut généralement mieux que de n'en lancer qu'une partie sans avertir.
 
@@ -194,6 +210,23 @@ function esRegistro(valor: unknown): valor is Record<string, unknown> {
   return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
+// La URL nunca se repite en un mensaje: puede traer usuario, clave o un token.
+function revisarUrl(url: string): string | undefined {
+  let direccion: URL;
+
+  try {
+    direccion = new URL(url);
+  } catch {
+    return "la URL no es válida";
+  }
+
+  if (direccion.username !== "" || direccion.password !== "") {
+    return "la URL no debe llevar usuario ni clave";
+  }
+
+  return undefined;
+}
+
 function leerServicio(valor: unknown): Resultado<Servicio> {
   if (!esRegistro(valor)) {
     return { ok: false, detalle: "debe ser un objeto" };
@@ -211,6 +244,12 @@ function leerServicio(valor: unknown): Resultado<Servicio> {
     timeoutMs <= 0
   ) {
     return { ok: false, detalle: "servicio incompleto o inválido" };
+  }
+
+  const problemaUrl = revisarUrl(url);
+
+  if (problemaUrl !== undefined) {
+    return { ok: false, detalle: problemaUrl };
   }
 
   return { ok: true, valor: { nombre, url, timeoutMs } };
@@ -257,6 +296,8 @@ configuración: 2 servicios
 ```
 
 Depuis TypeScript 6, `@types/node` n'est plus chargé automatiquement quand on compile un fichier isolé. Comme cette figure importe `node:fs/promises`, `--types node` inclut explicitement les déclarations de Node installées et permet à TypeScript de reconnaître ce module natif. L'option n'apporte que des types pour la compilation ; Node continue de fournir le module quand le programme s'exécute.
+
+L'URL a une règle de plus que le texte non vide. `revisarUrl` l'analyse avec `new URL` et rejette celle qui n'est pas une URL valide ou qui porte un utilisateur ou un mot de passe avant le serveur. Un identifiant écrit dans la configuration finit copié dans le journal, dans les rapports et dans les messages d'erreur, et quiconque les lit peut s'en servir. C'est pourquoi les deux messages sont propres au programme et ne répètent pas l'URL : ils disent quelle règle a échoué, jamais l'adresse avec ce qu'elle contenait. Si la destination exige une authentification, l'identifiant va à part, dans une variable d'environnement ou dans un gestionnaire de secrets, et non dans l'URL.
 
 Le `as unknown` à la fin de `JSON.parse` n'affirme pas que le document est valide. Il fait le contraire : il évite de se fier au type large exposé par la bibliothèque et force `leerServicios` à le traiter comme une entrée non vérifiée. La preuve vient des vérifications concrètes de `Array.isArray`, `esRegistro`, `typeof` et `Number.isSafeInteger`.
 
@@ -528,7 +569,7 @@ Les erreurs de JSON ont une autre forme parce qu'elles se produisent pendant l'e
 
 ### Exercice 1 — Un lecteur d'URL
 
-Écris `leerUrl(valor: unknown): Resultado<string>`. Elle doit accepter uniquement un texte non vide pouvant être converti avec `new URL(valor)`. Si le texte n'est pas une URL valide, elle doit renvoyer `ok: false` avec un détail lisible. Teste-la avec `https://catalogo.example` et avec `no-es-url`.
+Écris `leerUrl(valor: unknown): Resultado<string>`. Elle doit accepter uniquement un texte non vide pouvant être converti avec `new URL(valor)`. Si le texte n'est pas une URL valide, elle doit renvoyer `ok: false` avec un détail lisible. Teste-la avec `https://catalogo.example` et avec `no-es-url`. Elle doit aussi rejeter l'URL qui porte un utilisateur ou un mot de passe, avec un message fixe qui ne la répète pas ; teste-la aussi avec une URL qui contient `usuario:clave@` avant le serveur.
 
 ### Exercice 2 — Liste à noms uniques
 
@@ -546,7 +587,7 @@ Utilise le patron `Esquema<T>` et `Inferir` pour créer un schéma d'une répons
 
 ### Solution 1
 
-La fonction confirme d'abord qu'elle a reçu du texte, puis délègue la syntaxe à `URL`. Le constructeur peut lancer une exception ; on ne l'attrape donc que pour convertir une entrée invalide en résultat attendu de la validation.
+La fonction confirme d'abord qu'elle a reçu du texte, puis délègue la syntaxe à `URL`. Le constructeur peut lancer une exception ; on ne l'attrape donc que pour convertir une entrée invalide en résultat attendu de la validation. Une fois analysée, l'URL est aussi vérifiée de l'intérieur : si elle porte un utilisateur ou un mot de passe, elle est rejetée avec un détail fixe, car la renvoyer dans le message divulguerait l'identifiant.
 
 ```ts
 function leerUrl(valor: unknown): Resultado<string> {
@@ -555,7 +596,12 @@ function leerUrl(valor: unknown): Resultado<string> {
   }
 
   try {
-    new URL(valor);
+    const direccion = new URL(valor);
+
+    if (direccion.username !== "" || direccion.password !== "") {
+      return { ok: false, detalle: "la URL no debe llevar usuario ni clave" };
+    }
+
     return { ok: true, valor };
   } catch {
     return { ok: false, detalle: "url no tiene un formato válido" };

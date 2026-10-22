@@ -19,6 +19,11 @@
 # Requisitos: node (LTS) y las dependencias de herramientas/package.json
 # (cd herramientas && npm ci). Sale 0 si todo cuadra, 1 si algo no, 2 si no pudo medir.
 #
+# Al final corre, OBLIGATORIA, la prueba de la URL sembrada (verificar-url-sembrada.sh): los
+# revisores de las lecciones 6 a 9 rechazan al cargar una URL con usuario o clave y no repiten
+# sus secretos en ningún error, bitácora ni reporte. Si ese guion falta o sale en rojo, este
+# también. No corre con --mostrar ni con --exportar, que no verifican.
+#
 # CONVENCIÓN DE LAS LECCIONES (la lee este guion):
 #   * Un archivo de un programa es un bloque ```ts (o ```tsx) cuya PRIMERA línea
 #     es un comentario con su ruta:  // fig05_03.ts   o   // fig07_02/modelo.ts
@@ -280,3 +285,15 @@ if sin_salida:
     print(f"  {sin_salida} programa(s) sin salida documentada. NO publicar."); sys.exit(1)
 print("  Todas las salidas documentadas corresponden a la ejecución real.")
 PY
+rc=$?
+[ "$rc" -eq 0 ] || exit "$rc"
+[ -z "$MODO" ] || exit 0
+
+# ─── la prueba de la URL sembrada: obligatoria ──────────────────────────────────────────
+echo
+URL_SEMBRADA="$HERR/verificar-url-sembrada.sh"
+if [ ! -f "$URL_SEMBRADA" ]; then
+  echo "❌ falta herramientas/verificar-url-sembrada.sh: la prueba de la URL sembrada es obligatoria"
+  exit 1
+fi
+bash "$URL_SEMBRADA" || exit 1

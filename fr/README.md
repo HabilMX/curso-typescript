@@ -21,7 +21,7 @@ Le **`revisor`** : une API qui interroge une liste de services **en même temps*
 | 2 | [Types, fonctions et inférence](02-tipos-funciones-inferencia.md) | les fonctions de base du `revisor` | primitifs, inférence, unions et littéraux, *narrowing* (affinage de type), `null` et `undefined` |
 | 3 | [Objets et modèle de données](03-objetos-modelo-datos.md) | le modèle `Servicio` / `Estado` | `type` vs `interface`, typage structurel, `readonly`, unions discriminées |
 | 4 | [Collections, génériques et erreurs](04-colecciones-genericos-errores.md) | la liste de services et le rapport | tableaux, `Map`/`Set`, génériques, types utilitaires, erreurs |
-| 5 | [Asynchronisme : qu'il vérifie tout à la fois](05-asincronia.md) | le `revisor` concurrent | boucle d'événements (*event loop*), promesses, `async/await`, `Promise.all` vs `allSettled`, `AbortController` |
+| 5 | [Asynchronisme : tout vérifier en même temps](05-asincronia.md) | le `revisor` concurrent | boucle d'événements (*event loop*), promesses, `async/await`, `Promise.all` vs `allSettled`, `AbortController` |
 | 6 | [Les données qui viennent de l'extérieur](06-datos-de-fuera.md) | validation de la configuration et des réponses | valider à la frontière ; types dérivés du schéma |
 | 7 | [Modules, tests et qualité](07-modulos-pruebas-calidad.md) | le vrai projet, avec des tests | modules ESM, tests pilotés par table de cas, lint et formatage |
 | 8 | [Le serveur](08-el-servidor.md) | l'API HTTP du `revisor` | serveur HTTP, routes typées, JSON, configuration, arrêt propre |

@@ -42,10 +42,25 @@ EMOJI = re.compile("[\U0001F000-\U0001FAFF☀-➿⬀-⯿️‍]")
 # Los patrones de asistentes automáticos y sus empresas se LEEN de .publicable-prohibido.txt
 # (su último bloque), para que haya una sola lista y las dos puertas no se
 # desincronicen. Si el bloque falta o queda vacío, el guion falla cerrado.
+#
+# Esa lista lleva `export-ignore` (deletrea nombres de la infraestructura) y no viaja
+# a la copia publicada; tampoco viaja verificar-publicable.sh. En la copia publicada
+# -donde faltan los DOS- esta comprobación se omite con un aviso: la revisión de
+# patrones internos se corre ANTES de publicar, en el repositorio de trabajo. Si falta
+# la lista pero verificar-publicable.sh sigue ahí, es el repositorio de trabajo con la
+# lista perdida, y el guion falla cerrado (sale 2): ahí la revisión no se salta nunca.
 def patrones_ia():
     lista = os.path.join(os.path.dirname(os.path.abspath(sys.argv[1])), ".publicable-prohibido.txt")
     if not os.path.isfile(lista):
         lista = ".publicable-prohibido.txt"
+    if not os.path.isfile(lista):
+        if os.path.isfile("verificar-publicable.sh"):
+            print("falta .publicable-prohibido.txt en el repositorio de trabajo: no se puede revisar"
+                  " la mención de asistentes"); sys.exit(2)
+        print("  aviso: .publicable-prohibido.txt no está (copia publicada); la revisión de patrones"
+              " internos se corre antes de publicar, en el repo de trabajo.")
+        print()
+        return None
     pats, activo = [], False
     for l in open(lista, encoding="utf8").read().split("\n"):
         if l.startswith("# --- el curso no habla"):
@@ -94,7 +109,7 @@ for f in archivos:
             prob.append(f"emoji en un título: {l[:60]!r}")
     txt = "\n".join(lineas)
     if PEND.search(txt): prob.append("quedan marcas PENDIENTE/ESQUELETO/TODO")
-    ia = ASISTENTES.search(txt)
+    ia = ASISTENTES.search(txt) if ASISTENTES else None
     if ia: prob.append(f"menciona un asistente o su empresa: {ia.group(0)!r}")
     if sum(1 for l in lineas if l.strip().startswith("```")) % 2: prob.append("vallas de código desbalanceadas")
     if not re.search(rf"^\*\*{TIEMPO}\s?:?\*\*", txt, re.M): prob.append("falta la línea de duración («**{TIEMPO}:**»)")

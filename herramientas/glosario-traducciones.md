@@ -173,3 +173,8 @@ Convención: el término queda en la columna; «= » significa que no se traduce
 | operador de propagación (`...`) |  |  |  | оператор за разпростиране (spread) | trad-bg |
 | discriminante |  |  |  | дискриминант | trad-bg |
 | propiedad opcional |  |  |  | незадължително свойство | trad-bg |
+| credenciales (usuario y clave en una URL) | credentials | identifiants | credenciais | идентификационни данни | trad-es (lecciones 6 y 7) |
+| clave (contraseña) | password | mot de passe | senha | парола | trad-es (lecciones 6 y 7) |
+| gestor de secretos | secrets manager | gestionnaire de secrets | gerenciador de segredos | мениджър на тайни | trad-es (lección 6) |
+| redactar (una URL: dejar protocolo, servidor y ruta) | redact | masquer | ocultar | скривам | trad-es (lección 7) |
+| *query string* | *query string* | *query string* | *query string* | *query string* | trad-es (lección 7) |

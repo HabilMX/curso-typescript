@@ -552,6 +552,23 @@ function esRegistro(valor: unknown): valor is Record<string, unknown> {
   return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
+// La URL nunca se repite en un mensaje: puede traer usuario, clave o un token.
+function revisarUrl(url: string): string | undefined {
+  let direccion: URL;
+
+  try {
+    direccion = new URL(url);
+  } catch {
+    return "la URL no es válida";
+  }
+
+  if (direccion.username !== "" || direccion.password !== "") {
+    return "la URL no debe llevar usuario ni clave";
+  }
+
+  return undefined;
+}
+
 function leerServicio(valor: unknown): Resultado<Servicio> {
   if (!esRegistro(valor)) {
     return { ok: false, detalle: "cada servicio debe ser un objeto" };
@@ -569,6 +586,12 @@ function leerServicio(valor: unknown): Resultado<Servicio> {
     timeoutMs <= 0
   ) {
     return { ok: false, detalle: "servicio incompleto o inválido" };
+  }
+
+  const problemaUrl = revisarUrl(url);
+
+  if (problemaUrl !== undefined) {
+    return { ok: false, detalle: problemaUrl };
   }
 
   return { ok: true, valor: { nombre, url, timeoutMs } };
@@ -595,7 +618,7 @@ export function leerServicios(valor: unknown): Resultado<readonly Servicio[]> {
 }
 ```
 
-A solução reutiliza a mesma guarda `esRegistro` e as mesmas regras da lição 6: texto não vazio para nome e URL, e inteiro seguro positivo para `timeoutMs`. A validação conserva uma entrada `unknown` e devolve um contrato confiável antes de iniciar a revisão; `esRegistro` faz o estreitamento com verificações em tempo de execução, e não com uma asserção de tipo, de modo que o compilador e o programa coincidem.
+A solução reutiliza a mesma guarda `esRegistro` e as mesmas regras da lição 6: texto não vazio para nome e URL, uma URL válida sem usuário nem senha, e inteiro seguro positivo para `timeoutMs`. A validação conserva uma entrada `unknown` e devolve um contrato confiável antes de iniciar a revisão; `esRegistro` faz o estreitamento com verificações em tempo de execução, e não com uma asserção de tipo, de modo que o compilador e o programa coincidem.
 
 ### Solução 4
 
@@ -688,6 +711,23 @@ function esRegistro(valor: unknown): valor is Record<string, unknown> {
   return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
+// La URL nunca se repite en un mensaje: puede traer usuario, clave o un token.
+function revisarUrl(url: string): string | undefined {
+  let direccion: URL;
+
+  try {
+    direccion = new URL(url);
+  } catch {
+    return "la URL no es válida";
+  }
+
+  if (direccion.username !== "" || direccion.password !== "") {
+    return "la URL no debe llevar usuario ni clave";
+  }
+
+  return undefined;
+}
+
 function leerServicio(valor: unknown): Resultado<Servicio> {
   if (!esRegistro(valor)) {
     return { ok: false, detalle: "cada servicio debe ser un objeto" };
@@ -705,6 +745,12 @@ function leerServicio(valor: unknown): Resultado<Servicio> {
     timeoutMs <= 0
   ) {
     return { ok: false, detalle: "servicio incompleto o inválido" };
+  }
+
+  const problemaUrl = revisarUrl(url);
+
+  if (problemaUrl !== undefined) {
+    return { ok: false, detalle: problemaUrl };
   }
 
   return { ok: true, valor: { nombre, url, timeoutMs } };
@@ -751,6 +797,19 @@ import type { Estado, Servicio } from "./modelo.js";
 export type Respuesta = { readonly codigoHttp: number; readonly duracionMs: number };
 export type Consultar = (servicio: Servicio, senal: AbortSignal) => Promise<Respuesta>;
 
+// Un error de red puede traer la URL completa, con usuario, clave o token. El detalle
+// conserva el mensaje, pero cada URL queda solo con su esquema, servidor y ruta.
+function sinUrlCompleta(mensaje: string): string {
+  return mensaje.replace(/[a-z][a-z\d+.-]*:\/\/\S+/gi, (texto) => {
+    try {
+      const url = new URL(texto);
+      return `${url.protocol}//${url.host}${url.pathname}`;
+    } catch {
+      return "<URL>";
+    }
+  });
+}
+
 export async function revisarTodos(
   servicios: readonly Servicio[],
   consultar: Consultar,
@@ -769,13 +828,15 @@ export async function revisarTodos(
         return {
           servicio,
           tipo: "falla",
-          detalle: error instanceof Error ? error.message : "falla desconocida",
+          detalle: error instanceof Error ? sinUrlCompleta(error.message) : "falla desconocida",
         };
       }
     }),
   );
 }
 ```
+
+`revisar.ts` conserva a mensagem do erro no detalhe, mas não tal como veio: `sinUrlCompleta` deixa cada URL que aparecer nela só com o protocolo, o servidor e o caminho, sem usuário, sem senha, sem *query string* e sem fragmento. O `fetch` do Node, por exemplo, rejeita uma URL com credenciais com uma mensagem que a repete inteira, e esse texto chegaria igual ao relatório. A URL é ocultada em vez de remover a mensagem porque o detalhe é o que explica a falha a quem opera o `revisor`, e o teste `falla conserva detalle` continua valendo.
 
 ```ts
 // fig07_04/src/main.ts

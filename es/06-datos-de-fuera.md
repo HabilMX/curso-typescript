@@ -98,6 +98,16 @@ function esRegistro(valor: unknown): valor is Record<string, unknown> {
   return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
+// La URL nunca se repite en un mensaje: puede traer usuario, clave o un token.
+function tieneCredenciales(url: string): boolean {
+  try {
+    const { username, password } = new URL(url);
+    return username !== "" || password !== "";
+  } catch {
+    return false;
+  }
+}
+
 function leerServicio(valor: unknown): Resultado<Servicio> {
   if (!esRegistro(valor)) {
     return { ok: false, detalle: "debe ser un objeto" };
@@ -111,6 +121,10 @@ function leerServicio(valor: unknown): Resultado<Servicio> {
 
   if (typeof url !== "string" || url.trim() === "") {
     return { ok: false, detalle: "url debe ser texto no vacío" };
+  }
+
+  if (tieneCredenciales(url)) {
+    return { ok: false, detalle: "la URL no debe llevar usuario ni clave" };
   }
 
   if (
@@ -144,6 +158,8 @@ $ node fig06_02.js
 catálogo: 1500 ms
 inválido: timeoutMs debe ser un entero positivo
 ```
+
+`tieneCredenciales` rechaza desde aquí la URL que lleva usuario o clave, con un mensaje fijo que no la repite. La figura 06_03 explica por qué una credencial no debe viajar dentro de la URL.
 
 La función devuelve `Resultado<Servicio>` y no lanza una excepción para una mala configuración esperada. Eso permite decidir en quien llama si se debe detener el arranque, mostrar todos los errores o continuar con una configuración predeterminada. Para una lista de destinos que define qué se va a revisar, detener el arranque con una explicación suele ser mejor que iniciar sólo una parte sin avisar.
 
@@ -194,6 +210,23 @@ function esRegistro(valor: unknown): valor is Record<string, unknown> {
   return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
+// La URL nunca se repite en un mensaje: puede traer usuario, clave o un token.
+function revisarUrl(url: string): string | undefined {
+  let direccion: URL;
+
+  try {
+    direccion = new URL(url);
+  } catch {
+    return "la URL no es válida";
+  }
+
+  if (direccion.username !== "" || direccion.password !== "") {
+    return "la URL no debe llevar usuario ni clave";
+  }
+
+  return undefined;
+}
+
 function leerServicio(valor: unknown): Resultado<Servicio> {
   if (!esRegistro(valor)) {
     return { ok: false, detalle: "debe ser un objeto" };
@@ -211,6 +244,12 @@ function leerServicio(valor: unknown): Resultado<Servicio> {
     timeoutMs <= 0
   ) {
     return { ok: false, detalle: "servicio incompleto o inválido" };
+  }
+
+  const problemaUrl = revisarUrl(url);
+
+  if (problemaUrl !== undefined) {
+    return { ok: false, detalle: problemaUrl };
   }
 
   return { ok: true, valor: { nombre, url, timeoutMs } };
@@ -257,6 +296,8 @@ configuración: 2 servicios
 ```
 
 Desde TypeScript 6, `@types/node` ya no se carga automáticamente al compilar un archivo aislado. Como esta figura importa `node:fs/promises`, `--types node` incluye de forma explícita las declaraciones de Node instaladas y permite que TypeScript reconozca ese módulo nativo. La bandera sólo aporta tipos para la compilación; Node sigue proporcionando el módulo cuando se ejecuta el programa.
+
+La URL tiene una regla más que el texto no vacío. `revisarUrl` la analiza con `new URL` y rechaza la que no es una URL válida o la que lleva usuario o clave antes del servidor. Una credencial escrita en la configuración termina copiada en la bitácora, en los reportes y en los mensajes de error, y cualquiera que los lea puede usarla. Por eso los dos mensajes son propios y no repiten la URL: dicen qué regla falló, nunca la dirección con lo que traía. Si el destino pide autenticarse, la credencial va aparte, en una variable de entorno o en un gestor de secretos, y no dentro de la URL.
 
 El `as unknown` al final de `JSON.parse` no afirma que el documento sea válido. Hace lo contrario: evita confiar en el tipo amplio que expone la biblioteca y fuerza a `leerServicios` a tratarlo como entrada sin verificar. La evidencia llega de las comprobaciones concretas de `Array.isArray`, `esRegistro`, `typeof` y `Number.isSafeInteger`.
 
@@ -528,7 +569,7 @@ Los errores de JSON tienen otra forma porque ocurren durante la ejecución. `JSO
 
 ### Ejercicio 1 — Un lector de URL
 
-Escribe `leerUrl(valor: unknown): Resultado<string>`. Debe aceptar sólo texto no vacío que pueda convertirse en `new URL(valor)`. Si el texto no es una URL válida, debe devolver `ok: false` con un detalle legible. Pruébalo con `https://catalogo.example` y con `no-es-url`.
+Escribe `leerUrl(valor: unknown): Resultado<string>`. Debe aceptar sólo texto no vacío que pueda convertirse en `new URL(valor)`. Si el texto no es una URL válida, debe devolver `ok: false` con un detalle legible. Pruébalo con `https://catalogo.example` y con `no-es-url`. Además, debe rechazar la URL que lleva usuario o clave con un mensaje fijo que no la repita; pruébalo también con una URL que traiga `usuario:clave@` antes del servidor.
 
 ### Ejercicio 2 — Lista con nombres únicos
 
@@ -546,7 +587,7 @@ Usa el patrón `Esquema<T>` e `Inferir` para crear un esquema de una respuesta c
 
 ### Solución 1
 
-La función primero confirma que recibió texto y después delega la sintaxis a `URL`. El constructor puede lanzar, por lo que se captura únicamente para convertir una entrada inválida en el resultado esperado de la validación.
+La función primero confirma que recibió texto y después delega la sintaxis a `URL`. El constructor puede lanzar, por lo que se captura únicamente para convertir una entrada inválida en el resultado esperado de la validación. Una vez analizada, la URL se revisa también por dentro: si trae usuario o clave, se rechaza con un detalle fijo, porque devolverla en el mensaje filtraría la credencial.
 
 ```ts
 function leerUrl(valor: unknown): Resultado<string> {
@@ -555,7 +596,12 @@ function leerUrl(valor: unknown): Resultado<string> {
   }
 
   try {
-    new URL(valor);
+    const direccion = new URL(valor);
+
+    if (direccion.username !== "" || direccion.password !== "") {
+      return { ok: false, detalle: "la URL no debe llevar usuario ni clave" };
+    }
+
     return { ok: true, valor };
   } catch {
     return { ok: false, detalle: "url no tiene un formato válido" };

@@ -21,7 +21,7 @@
 
 Истинската програма не живее само от обекти, написани от този, който програмира. Списъкът от услуги може да идва от JSON файл, който някой от операциите е променил. Портът на API може да идва от променлива на средата, конфигурирана при стартирането на контейнер. Отговорът на отдалечена услуга може да носи JSON, произведен от друго приложение, с друга версия, друга политика за грешки или временен дефект. И в трите случая програмата получава стойности на JavaScript, които не са минали през компилатора на този проект.
 
-Това е важна граница. Вътре в `revisor`, след валидация, можеш да работиш със `Servicio`, `Estado` и `Reporte` като с известни договори. На границата, преди валидацията, знаеш само че нещо е пристигнало. Може да е обект, масив, `null`, текст, число или обект, който изглежда правилен, освен за едно свойство. Здравото решение е да направиш тази несигурност изрична: да получиш `unknown`, да инспектираш стойността по време на изпълнение и да произведеш надеждна данна или грешка, която показва какво трябва да се поправи.
+Това е важна граница. Вътре в `revisor`, след валидация, можеш да работиш със `Servicio`, `Estado` и `Reporte` като с известни договори. На границата, преди валидацията, знаеш само че нещо е пристигнало. Може да е обект, масив, `null`, текст, число или обект, който изглежда правилен, освен за едно свойство. Здравото решение е да направиш тази несигурност изрична: да получиш `unknown`, да инспектираш стойността по време на изпълнение и да произведеш надеждна стойност или грешка, която показва какво трябва да се поправи.
 
 Често се мисли, че анотация на TypeScript решава този проблем. Ако напишеш `const servicio = JSON.parse(texto) as Servicio`, редакторът престава да показва предупреждения и следващият код може да чете `servicio.timeoutMs`. Но не е извършена никаква проверка. `as Servicio` моли компилатора да ти се довери; не изследва JSON, не превръща низ в число и не добавя липсващо свойство. Когато Node изпълни излъчения JavaScript, псевдонимът `Servicio` вече няма да съществува.
 
@@ -98,6 +98,16 @@ function esRegistro(valor: unknown): valor is Record<string, unknown> {
   return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
+// La URL nunca se repite en un mensaje: puede traer usuario, clave o un token.
+function tieneCredenciales(url: string): boolean {
+  try {
+    const { username, password } = new URL(url);
+    return username !== "" || password !== "";
+  } catch {
+    return false;
+  }
+}
+
 function leerServicio(valor: unknown): Resultado<Servicio> {
   if (!esRegistro(valor)) {
     return { ok: false, detalle: "debe ser un objeto" };
@@ -111,6 +121,10 @@ function leerServicio(valor: unknown): Resultado<Servicio> {
 
   if (typeof url !== "string" || url.trim() === "") {
     return { ok: false, detalle: "url debe ser texto no vacío" };
+  }
+
+  if (tieneCredenciales(url)) {
+    return { ok: false, detalle: "la URL no debe llevar usuario ni clave" };
   }
 
   if (
@@ -144,6 +158,8 @@ $ node fig06_02.js
 catálogo: 1500 ms
 inválido: timeoutMs debe ser un entero positivo
 ```
+
+`tieneCredenciales` отхвърля още тук URL адрес, който носи потребител или парола, с фиксирано съобщение, което не го повтаря. Фигура 06_03 обяснява защо идентификационните данни не трябва да пътуват в URL адреса.
 
 Функцията връща `Resultado<Servicio>` и не хвърля изключение при очаквана лоша конфигурация. Това позволява извикващият да реши дали да спре стартирането, да покаже всички грешки или да продължи с конфигурация по подразбиране. За списък от цели, който определя какво ще се проверява, да спреш стартирането с обяснение обикновено е по-добре, отколкото да стартираш само част, без да предупредиш.
 
@@ -194,6 +210,23 @@ function esRegistro(valor: unknown): valor is Record<string, unknown> {
   return typeof valor === "object" && valor !== null && !Array.isArray(valor);
 }
 
+// La URL nunca se repite en un mensaje: puede traer usuario, clave o un token.
+function revisarUrl(url: string): string | undefined {
+  let direccion: URL;
+
+  try {
+    direccion = new URL(url);
+  } catch {
+    return "la URL no es válida";
+  }
+
+  if (direccion.username !== "" || direccion.password !== "") {
+    return "la URL no debe llevar usuario ni clave";
+  }
+
+  return undefined;
+}
+
 function leerServicio(valor: unknown): Resultado<Servicio> {
   if (!esRegistro(valor)) {
     return { ok: false, detalle: "debe ser un objeto" };
@@ -211,6 +244,12 @@ function leerServicio(valor: unknown): Resultado<Servicio> {
     timeoutMs <= 0
   ) {
     return { ok: false, detalle: "servicio incompleto o inválido" };
+  }
+
+  const problemaUrl = revisarUrl(url);
+
+  if (problemaUrl !== undefined) {
+    return { ok: false, detalle: problemaUrl };
   }
 
   return { ok: true, valor: { nombre, url, timeoutMs } };
@@ -257,6 +296,8 @@ configuración: 2 servicios
 ```
 
 От TypeScript 6 нататък `@types/node` вече не се зарежда автоматично, когато компилираш изолиран файл. Тъй като тази фигура импортира `node:fs/promises`, `--types node` включва изрично инсталираните декларации на Node и позволява на TypeScript да разпознае този вграден модул. Флагът носи само типове за компилацията; Node продължава да предоставя модула, когато програмата се изпълнява.
+
+URL адресът има още едно правило освен непразния текст. `revisarUrl` го анализира с `new URL` и отхвърля този, който не е валиден URL адрес или носи потребител или парола преди сървъра. Идентификационни данни, записани в конфигурацията, накрая се копират в журнала (log), в отчетите и в съобщенията за грешка, и всеки, който ги прочете, може да ги използва. Затова двете съобщения са собствени на програмата и не повтарят URL адреса: казват кое правило не е изпълнено, никога адреса с това, което носеше. Ако дестинацията изисква удостоверяване, идентификационните данни отиват отделно — в променлива на средата или в мениджър на тайни, а не в URL адреса.
 
 `as unknown` в края на `JSON.parse` не твърди, че документът е валиден. Прави обратното: не позволява да се довериш на широкия тип, който библиотеката излага, и принуждава `leerServicios` да го третира като непроверен вход. Доказателството идва от конкретните проверки на `Array.isArray`, `esRegistro`, `typeof` и `Number.isSafeInteger`.
 
@@ -528,7 +569,7 @@ TS18046 не се оправя с `valor as { nombre: string }`. Това твъ
 
 ### Упражнение 1 — Четец на URL
 
-Напиши `leerUrl(valor: unknown): Resultado<string>`. Тя трябва да приема само непразен текст, който може да се превърне в `new URL(valor)`. Ако текстът не е валиден URL, трябва да върне `ok: false` с четима подробност. Изпробвай я с `https://catalogo.example` и с `no-es-url`.
+Напиши `leerUrl(valor: unknown): Resultado<string>`. Тя трябва да приема само непразен текст, който може да се превърне в `new URL(valor)`. Ако текстът не е валиден URL, трябва да върне `ok: false` с четима подробност. Изпробвай я с `https://catalogo.example` и с `no-es-url`. Освен това трябва да отхвърля URL адрес, който носи потребител или парола, с фиксирано съобщение, което не го повтаря; изпробвай я и с URL адрес, който има `usuario:clave@` преди сървъра.
 
 ### Упражнение 2 — Списък с уникални имена
 
@@ -546,7 +587,7 @@ TS18046 не се оправя с `valor as { nombre: string }`. Това твъ
 
 ### Решение 1
 
-Функцията първо потвърждава, че е получила текст, и после делегира синтаксиса на `URL`. Конструкторът може да хвърли, затова се прихваща единствено за да превърне невалиден вход в очаквания резултат на валидацията.
+Функцията първо потвърждава, че е получила текст, и после делегира синтаксиса на `URL`. Конструкторът може да хвърли, затова се прихваща единствено за да превърне невалиден вход в очаквания резултат на валидацията. След като е анализиран, URL адресът се проверява и отвътре: ако носи потребител или парола, се отхвърля с фиксирана подробност, защото връщането му в съобщението би издало идентификационните данни.
 
 ```ts
 function leerUrl(valor: unknown): Resultado<string> {
@@ -555,7 +596,12 @@ function leerUrl(valor: unknown): Resultado<string> {
   }
 
   try {
-    new URL(valor);
+    const direccion = new URL(valor);
+
+    if (direccion.username !== "" || direccion.password !== "") {
+      return { ok: false, detalle: "la URL no debe llevar usuario ni clave" };
+    }
+
     return { ok: true, valor };
   } catch {
     return { ok: false, detalle: "url no tiene un formato válido" };
